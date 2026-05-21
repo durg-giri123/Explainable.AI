@@ -20,15 +20,23 @@ function LoginPage() {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !password) {
+      toast.error("Enter your email and password");
+      return;
+    }
+
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email: trimmedEmail, password });
     setLoading(false);
     if (error) {
       toast.error(error.message);
       return;
     }
     toast.success("Welcome back");
-    navigate({ to: "/dashboard" });
+    await navigate({ to: "/dashboard" });
   };
 
   return (

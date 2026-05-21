@@ -32,17 +32,28 @@ function SignupPage() {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+
+    const trimmedEmail = email.trim();
+    const trimmedName = displayName.trim();
+
+    if (!trimmedEmail || !password) {
+      toast.error("Enter your email and password");
+      return;
+    }
+
     if (password.length < 6) {
       toast.error("Password must be at least 6 characters");
       return;
     }
+
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: trimmedEmail,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/dashboard`,
-        data: { display_name: displayName || email.split("@")[0] },
+        data: { display_name: trimmedName || trimmedEmail.split("@")[0] },
       },
     });
     setLoading(false);
@@ -52,10 +63,10 @@ function SignupPage() {
     }
     if (data.session) {
       toast.success("Welcome to NeuroScan AI");
-      navigate({ to: "/dashboard" });
+      await navigate({ to: "/dashboard" });
     } else {
       toast.success("Check your email to confirm your account");
-      navigate({ to: "/login" });
+      await navigate({ to: "/login" });
     }
   };
 
