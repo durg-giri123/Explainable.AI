@@ -93,16 +93,29 @@ function DashboardPage() {
         </section>
 
         <section className="rounded-lg border bg-card p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground">Smart Quest Core</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Open the live app in a new tab.</p>
-          <a
-            href="https://smart-quest-core.lovable.app/"
-            target="_blank"
-            rel="noopener noreferrer"
+          <h2 className="text-lg font-semibold text-foreground">Your NeuroScan</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Start a new screening to check for early signals across cognitive,
+            sleep, and lifestyle markers.
+          </p>
+          <button
+            type="button"
             className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            onClick={() => toast.info("New scan flow coming soon")}
           >
-            Visit Smart Quest Core →
-          </a>
+            Start new scan
+          </button>
+        </section>
+
+        <section className="rounded-lg border bg-card p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-foreground">Preventive plan</h2>
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li>• 7–9 hours of consistent sleep per night</li>
+            <li>• 150 min/week aerobic activity</li>
+            <li>• Mediterranean-style nutrition</li>
+            <li>• 10 min/day cognitive training</li>
+            <li>• Annual NeuroScan check-in</li>
+          </ul>
         </section>
       </div>
     </main>
