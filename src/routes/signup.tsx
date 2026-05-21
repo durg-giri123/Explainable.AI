@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { AuthLayout } from "@/components/auth-layout";
+import { Loader2, User, Mail, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/signup")({
   component: SignupPage,
@@ -16,6 +18,17 @@ function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const strength = (() => {
+    let s = 0;
+    if (password.length >= 6) s++;
+    if (password.length >= 10) s++;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) s++;
+    if (/\d/.test(password) || /[^A-Za-z0-9]/.test(password)) s++;
+    return s;
+  })();
+  const strengthLabel = ["Too short", "Weak", "Okay", "Good", "Strong"][strength];
+  const strengthColor = ["bg-muted", "bg-destructive", "bg-amber-500", "bg-amber-400", "bg-emerald-500"][strength];
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -38,7 +51,7 @@ function SignupPage() {
       return;
     }
     if (data.session) {
-      toast.success("Account created");
+      toast.success("Welcome to NeuroScan AI");
       navigate({ to: "/dashboard" });
     } else {
       toast.success("Check your email to confirm your account");
@@ -47,32 +60,87 @@ function SignupPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4">
-      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-5 rounded-lg border bg-card p-6 shadow-sm">
-        <div className="space-y-1 text-center">
-          <h1 className="text-2xl font-bold text-foreground">Create an account</h1>
-          <p className="text-sm text-muted-foreground">Sign up to get started</p>
-        </div>
+    <AuthLayout title="Create your account" subtitle="Start your first NeuroScan in under five minutes">
+      <form onSubmit={onSubmit} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="display_name">Display name</Label>
-          <Input id="display_name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Jane Doe" />
+          <div className="relative">
+            <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="display_name"
+              className="pl-9 h-11"
+              placeholder="Jane Doe"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+            />
+          </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <div className="relative">
+            <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              required
+              className="pl-9 h-11"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" autoComplete="new-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+          <div className="relative">
+            <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              className="pl-9 h-11"
+              placeholder="At least 6 characters"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          {password.length > 0 && (
+            <div className="space-y-1">
+              <div className="flex gap-1">
+                {[0, 1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-1 flex-1 rounded-full transition-colors ${i < strength ? strengthColor : "bg-muted"}`}
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">{strengthLabel}</p>
+            </div>
+          )}
         </div>
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Creating account…" : "Sign up"}
+        <Button
+          type="submit"
+          className="w-full h-11 text-base font-medium transition-all hover:opacity-90"
+          style={{ background: "var(--gradient-brand)" }}
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating account…
+            </>
+          ) : (
+            "Create account"
+          )}
         </Button>
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link to="/login" className="font-medium text-primary hover:underline">Sign in</Link>
+          <Link to="/login" className="font-medium text-primary hover:underline">
+            Sign in
+          </Link>
         </p>
       </form>
-    </main>
+    </AuthLayout>
   );
 }
