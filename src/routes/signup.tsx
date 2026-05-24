@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ export const Route = createFileRoute("/signup")({
 });
 
 function SignupPage() {
-  const navigate = useNavigate();
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,7 +51,7 @@ function SignupPage() {
       email: trimmedEmail,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: window.location.origin,
         data: { display_name: trimmedName || trimmedEmail.split("@")[0] },
       },
     });
@@ -63,10 +62,10 @@ function SignupPage() {
     }
     if (data.session) {
       toast.success("Welcome to NeuroScan AI");
-      await navigate({ to: "/dashboard" });
+      window.location.assign("/");
     } else {
       toast.success("Check your email to confirm your account");
-      await navigate({ to: "/login" });
+      window.location.assign("/login");
     }
   };
 

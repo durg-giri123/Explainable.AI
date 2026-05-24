@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import {
   Brain,
   ShieldCheck,
@@ -63,6 +66,40 @@ const features = [
 ];
 
 function Landing() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) {
+        setIsAuthenticated(Boolean(data.session?.user));
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(Boolean(session?.user));
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const onSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    toast.success("Signed out");
+    window.location.assign("/");
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
@@ -77,16 +114,29 @@ function Landing() {
             NeuroScan AI
           </Link>
           <nav className="flex items-center gap-2">
-            <Button asChild variant="ghost">
-              <Link to="/login">Sign in</Link>
-            </Button>
-            <Button
-              asChild
-              className="text-white hover:opacity-90"
-              style={{ background: "var(--gradient-brand)" }}
-            >
-              <Link to="/signup">Get started</Link>
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <Button asChild variant="outline">
+                  <Link to="/dashboard">Dashboard</Link>
+                </Button>
+                <Button variant="ghost" onClick={onSignOut}>
+                  Sign out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button asChild variant="ghost">
+                  <Link to="/login">Sign in</Link>
+                </Button>
+                <Button
+                  asChild
+                  className="text-white hover:opacity-90"
+                  style={{ background: "var(--gradient-brand)" }}
+                >
+                  <Link to="/signup">Get started</Link>
+                </Button>
+              </>
+            )}
           </nav>
         </div>
       </header>
@@ -128,10 +178,14 @@ function Landing() {
                   boxShadow: "var(--shadow-glow)",
                 }}
               >
-                <Link to="/signup">Start free assessment</Link>
+                <Link to={isAuthenticated ? "/dashboard" : "/signup"}>
+                  {isAuthenticated ? "Open dashboard" : "Start free assessment"}
+                </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-8 text-base">
-                <Link to="/login">I have an account</Link>
+                <Link to={isAuthenticated ? "/dashboard" : "/login"}>
+                  {isAuthenticated ? "Review my plan" : "I have an account"}
+                </Link>
               </Button>
             </div>
             <p className="mt-6 text-xs text-muted-foreground">
