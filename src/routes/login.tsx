@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,7 +35,7 @@ function LoginPage() {
       return;
     }
     toast.success("Welcome back");
-    await navigate({ to: "/dashboard" });
+    window.location.assign("/");
   };
 
   return (
